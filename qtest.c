@@ -779,6 +779,6 @@ int main(int argc, char *argv[])
     bool ok = true;
     ok = ok && run_console(infile_name);
     ok = ok && finish_cmd();
-
+    freeHistory();
     return ok ? 0 : 1;
 }

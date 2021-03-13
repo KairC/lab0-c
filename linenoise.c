@@ -106,6 +106,7 @@
 #include "linenoise.h"
 #include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -130,7 +131,7 @@ static int atexit_registered = 0; /* Register atexit just 1 time. */
 static int history_max_len = LINENOISE_DEFAULT_HISTORY_MAX_LEN;
 static int history_len = 0;
 static char **history = NULL;
-
+static bool history_isFree = 0;
 /* The linenoiseState structure represents the state during line editing.
  * We pass this state to functions implementing specific editing
  * functionalities. */
@@ -1187,14 +1188,15 @@ void linenoiseFree(void *ptr)
 
 /* Free the history, but does not reset it. Only used when we have to
  * exit() to avoid memory leaks are reported by valgrind & co. */
-static void freeHistory(void)
+void freeHistory(void)
 {
-    if (history) {
+    if (!history_isFree) {
         int j;
 
         for (j = 0; j < history_len; j++)
             free(history[j]);
         free(history);
+        history_isFree = 1;
     }
 }
 

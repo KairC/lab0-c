@@ -55,8 +55,6 @@ bool q_insert_head(queue_t *q, char *s)
     newh = malloc(sizeof(list_ele_t));
     if (!newh)
         return false;
-    newh->value = NULL;
-    newh->next = NULL;
     /* Don't forget to allocate space for the string and copy it */
     /* What if either call to malloc returns NULL? */
     char *tmp = malloc(sizeof(char) * (strlen(s) + 1));
@@ -85,10 +83,11 @@ bool q_insert_tail(queue_t *q, char *s)
     /* TODO: You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
     /* TODO: Remove the above comment when you are about to implement. */
-    if (!q || !s)
+    if (!q)
         return false;
     list_ele_t *newh;
     newh = malloc(sizeof(list_ele_t));
+
     if (!newh)
         return false;
     char *tmp = malloc(sizeof(char) * (strlen(s) + 1));
@@ -100,7 +99,12 @@ bool q_insert_tail(queue_t *q, char *s)
     strlcpy(newh->value, s, strlen(s) + 1);
     newh->next = NULL;
     (q->size)++;
-    q->tail = (q->size == 1 ? (q->head = newh) : (q->tail->next = newh));
+    // q->tail = (q->size == 1 ? (q->head = newh) : (q->tail->next = newh));
+    if (q->size == 1) {
+        q->tail = q->head = newh;
+    } else {
+        q->tail = q->tail->next = newh;
+    }
     return true;
 }
 
@@ -118,13 +122,10 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     /* TODO: Remove the above comment when you are about to implement. */
     if (!q || !(q->head) || !sp)
         return false;
-    //  if (!sp)
-    //     sp = malloc(sizeof(char) * bufsize);
     strlcpy(sp, q->head->value, bufsize);
-    *(sp + bufsize - 1) = '\0';
     list_ele_t *tmp;
     tmp = q->head;
-    q->head = q->size == 1 ? q->tail = q->tail->next : q->head->next;
+    q->head = (q->size == 1 ? (q->tail = q->tail->next) : (q->head->next));
     free(tmp->value);
     free(tmp);
     (q->size)--;
